@@ -23,6 +23,7 @@ class ConditionType(str, enum.Enum):
     status_change = "status_change"
     consecutive_failures = "consecutive_failures"
     response_time_threshold = "response_time_threshold"
+    ssl_expiry = "ssl_expiry"
 
 
 class ChannelType(str, enum.Enum):

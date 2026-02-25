@@ -111,3 +111,29 @@ export async function fetchUptime(
   if (!res.ok) throw new Error(`Failed to fetch uptime: ${res.statusText}`);
   return res.json();
 }
+
+export interface SSLCertificate {
+  id: string;
+  service_id: string;
+  issuer: string;
+  subject: string;
+  serial_number: string;
+  not_before: string;
+  not_after: string;
+  days_until_expiry: number;
+  last_checked_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function fetchSSLCertificate(
+  serviceId: string,
+): Promise<SSLCertificate | null> {
+  const res = await fetch(
+    `${BASE_URL}/api/v1/services/${serviceId}/ssl`,
+  );
+  if (res.status === 404) return null;
+  if (!res.ok)
+    throw new Error(`Failed to fetch SSL certificate: ${res.statusText}`);
+  return res.json();
+}
