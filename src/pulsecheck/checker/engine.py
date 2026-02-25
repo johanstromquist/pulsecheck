@@ -8,6 +8,8 @@ import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from pulsecheck.alerting.dispatcher import NotificationDispatcher
+from pulsecheck.alerting.evaluator import AlertEvaluator
 from pulsecheck.db.session import async_session_factory
 from pulsecheck.models.health_check import HealthCheck, HealthStatus
 from pulsecheck.models.service import Service
@@ -22,6 +24,8 @@ REQUEST_TIMEOUT = 10  # seconds
 class HealthCheckEngine:
     def __init__(self) -> None:
         self._task: asyncio.Task | None = None
+        self._evaluator = AlertEvaluator()
+        self._dispatcher = NotificationDispatcher()
 
     async def start(self) -> None:
         self._task = asyncio.create_task(self._run_loop())
@@ -134,6 +138,18 @@ class HealthCheckEngine:
             status_code,
             response_time_ms,
         )
+
+        # Evaluate alert rules and dispatch notifications
+        try:
+            new_alerts = await self._evaluator.evaluate(session, service.id, check)
+            for alert in new_alerts:
+                rule = alert.rule
+                if rule.channels:
+                    await self._dispatcher.dispatch(session, alert, rule.channels)
+            if new_alerts:
+                await session.commit()
+        except Exception:
+            logger.exception("Error evaluating alerts for service %s", service.name)
 
         await ws_manager.broadcast({
             "type": "health_check",

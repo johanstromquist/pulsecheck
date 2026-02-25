@@ -9,6 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from pulsecheck.api.v1.routes.alert_rules import router as alert_rules_router
+from pulsecheck.api.v1.routes.alerts import router as alerts_router
+from pulsecheck.api.v1.routes.channels import router as channels_router
 from pulsecheck.api.v1.routes.metrics import router as metrics_router
 from pulsecheck.api.v1.routes.services import router as services_router
 from pulsecheck.checker.engine import HealthCheckEngine
@@ -30,6 +33,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="PulseCheck", lifespan=lifespan)
 app.include_router(services_router)
 app.include_router(metrics_router)
+app.include_router(alert_rules_router)
+app.include_router(channels_router)
+app.include_router(alerts_router)
 
 app.add_middleware(
     CORSMiddleware,
