@@ -54,6 +54,26 @@ export async function createService(
   return res.json();
 }
 
+export interface MetricsBucket {
+  timestamp: string;
+  avg_response_time_ms: number | null;
+  min_response_time_ms: number | null;
+  max_response_time_ms: number | null;
+  check_count: number;
+  healthy_count: number;
+  degraded_count: number;
+  down_count: number;
+  uptime_percentage: number;
+}
+
+export interface UptimePeriod {
+  period: string;
+  uptime_percentage: number | null;
+  total_checks: number;
+}
+
+export type Period = "1h" | "6h" | "24h" | "7d" | "30d";
+
 export async function fetchHealthChecks(
   serviceId: string,
 ): Promise<HealthCheck[]> {
@@ -62,5 +82,32 @@ export async function fetchHealthChecks(
   );
   if (!res.ok)
     throw new Error(`Failed to fetch health checks: ${res.statusText}`);
+  return res.json();
+}
+
+export async function fetchService(serviceId: string): Promise<Service> {
+  const res = await fetch(`${BASE_URL}/api/v1/services/${serviceId}`);
+  if (!res.ok) throw new Error(`Failed to fetch service: ${res.statusText}`);
+  return res.json();
+}
+
+export async function fetchMetrics(
+  serviceId: string,
+  period: Period = "24h",
+): Promise<MetricsBucket[]> {
+  const res = await fetch(
+    `${BASE_URL}/api/v1/services/${serviceId}/metrics?period=${period}`,
+  );
+  if (!res.ok) throw new Error(`Failed to fetch metrics: ${res.statusText}`);
+  return res.json();
+}
+
+export async function fetchUptime(
+  serviceId: string,
+): Promise<UptimePeriod[]> {
+  const res = await fetch(
+    `${BASE_URL}/api/v1/services/${serviceId}/uptime`,
+  );
+  if (!res.ok) throw new Error(`Failed to fetch uptime: ${res.statusText}`);
   return res.json();
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import type { Service, HealthCheck } from "../api/client";
 import { fetchHealthChecks } from "../api/client";
 import type { HealthCheckMessage } from "../hooks/useWebSocket";
@@ -45,7 +46,10 @@ export default function ServiceCard({ service, realtimeCheck }: ServiceCardProps
   const label = STATUS_LABELS[displayStatus] ?? "Unknown";
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+    <Link
+      to={`/services/${service.id}`}
+      className="block rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+    >
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
         <span className="flex items-center gap-1.5 text-sm text-gray-600">
@@ -68,6 +72,6 @@ export default function ServiceCard({ service, realtimeCheck }: ServiceCardProps
           <span>{displayResponseTime} ms</span>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
