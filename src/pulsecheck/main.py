@@ -12,8 +12,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pulsecheck.api.v1.routes.alert_rules import router as alert_rules_router
 from pulsecheck.api.v1.routes.alerts import router as alerts_router
 from pulsecheck.api.v1.routes.channels import router as channels_router
+from pulsecheck.api.v1.routes.incidents import router as incidents_router
 from pulsecheck.api.v1.routes.metrics import router as metrics_router
 from pulsecheck.api.v1.routes.services import router as services_router
+from pulsecheck.api.v1.routes.status_page import router as status_page_router
 from pulsecheck.checker.engine import HealthCheckEngine
 from pulsecheck.db.session import get_session
 from pulsecheck.models.health_check import HealthCheck
@@ -36,6 +38,8 @@ app.include_router(metrics_router)
 app.include_router(alert_rules_router)
 app.include_router(channels_router)
 app.include_router(alerts_router)
+app.include_router(incidents_router)
+app.include_router(status_page_router)
 
 app.add_middleware(
     CORSMiddleware,
