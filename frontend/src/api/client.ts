@@ -307,3 +307,32 @@ export async function fetchStatusPage(): Promise<StatusPageData> {
     throw new Error(`Failed to fetch status page: ${res.statusText}`);
   return res.json();
 }
+
+// --- Region check types and API ---
+
+export interface RegionCheckResult {
+  region_id: string;
+  region_name: string;
+  status: "healthy" | "degraded" | "down";
+  response_time_ms: number | null;
+  status_code: number | null;
+  error_message: string | null;
+  checked_at: string;
+}
+
+export interface ByRegionResponse {
+  service_id: string;
+  consensus_status: string | null;
+  regions: RegionCheckResult[];
+}
+
+export async function fetchChecksByRegion(
+  serviceId: string,
+): Promise<ByRegionResponse> {
+  const res = await fetch(
+    `${BASE_URL}/api/v1/services/${serviceId}/checks/by-region`,
+  );
+  if (!res.ok)
+    throw new Error(`Failed to fetch region checks: ${res.statusText}`);
+  return res.json();
+}
