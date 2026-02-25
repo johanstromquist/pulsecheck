@@ -16,12 +16,14 @@ import type {
   MetricsBucket,
   UptimePeriod,
   Period,
+  SSLCertificate,
 } from "../api/client";
 import {
   fetchService,
   fetchHealthChecks,
   fetchMetrics,
   fetchUptime,
+  fetchSSLCertificate,
 } from "../api/client";
 
 const PERIODS: { value: Period; label: string }[] = [
@@ -362,6 +364,88 @@ function RecentChecksTable({ checks }: { checks: HealthCheck[] }) {
   );
 }
 
+/* ---------- SSL Status ---------- */
+
+function SSLStatusCard({ cert }: { cert: SSLCertificate | null }) {
+  if (cert === null) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-5">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700">
+          SSL Certificate
+        </h3>
+        <div className="py-4 text-center text-sm text-gray-400">
+          No SSL certificate data available. Service may not use HTTPS.
+        </div>
+      </div>
+    );
+  }
+
+  const days = cert.days_until_expiry;
+  let statusColor = "text-green-700 bg-green-100";
+  let statusLabel = "Valid";
+  if (days <= 7) {
+    statusColor = "text-red-700 bg-red-100";
+    statusLabel = "Critical";
+  } else if (days <= 30) {
+    statusColor = "text-yellow-700 bg-yellow-100";
+    statusLabel = "Expiring Soon";
+  }
+
+  const expiryDate = new Date(cert.not_after).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  let dotColor = "bg-green-500";
+  if (days <= 7) dotColor = "bg-red-500";
+  else if (days <= 30) dotColor = "bg-yellow-500";
+
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-gray-700">SSL Certificate</h3>
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor}`}
+        >
+          <span className={`inline-block h-1.5 w-1.5 rounded-full ${dotColor}`} />
+          {statusLabel}
+        </span>
+      </div>
+      <div className="space-y-3">
+        <div className="flex items-start justify-between">
+          <span className="text-xs text-gray-500">Issuer</span>
+          <span className="max-w-[60%] text-right text-xs font-medium text-gray-700 break-all">
+            {cert.issuer}
+          </span>
+        </div>
+        <div className="flex items-start justify-between">
+          <span className="text-xs text-gray-500">Subject</span>
+          <span className="max-w-[60%] text-right text-xs font-medium text-gray-700 break-all">
+            {cert.subject}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-500">Expiry Date</span>
+          <span className="text-xs font-medium text-gray-700">{expiryDate}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-500">Days Remaining</span>
+          <span className={`text-sm font-bold ${days <= 7 ? "text-red-600" : days <= 30 ? "text-yellow-600" : "text-green-600"}`}>
+            {days}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-500">Last Checked</span>
+          <span className="text-xs text-gray-500">
+            {new Date(cert.last_checked_at).toLocaleString()}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ---------- Main page ---------- */
 
 export default function ServiceDetail() {
@@ -371,10 +455,12 @@ export default function ServiceDetail() {
   const [metrics, setMetrics] = useState<MetricsBucket[]>([]);
   const [uptime, setUptime] = useState<UptimePeriod[]>([]);
   const [checks, setChecks] = useState<HealthCheck[]>([]);
+  const [sslCert, setSSLCert] = useState<SSLCertificate | null>(null);
   const [period, setPeriod] = useState<Period>("24h");
   const [loadingService, setLoadingService] = useState(true);
   const [loadingMetrics, setLoadingMetrics] = useState(true);
   const [loadingChecks, setLoadingChecks] = useState(true);
+  const [loadingSSL, setLoadingSSL] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Load service info and uptime (once)
@@ -398,6 +484,16 @@ export default function ServiceDetail() {
       .then(setChecks)
       .catch(() => {})
       .finally(() => setLoadingChecks(false));
+  }, [id]);
+
+  // Load SSL certificate info (once)
+  useEffect(() => {
+    if (!id) return;
+    setLoadingSSL(true);
+    fetchSSLCertificate(id)
+      .then(setSSLCert)
+      .catch(() => setSSLCert(null))
+      .finally(() => setLoadingSSL(false));
   }, [id]);
 
   // Load metrics (on period change)
@@ -496,6 +592,22 @@ export default function ServiceDetail() {
           </div>
         </div>
       ) : null}
+
+      {/* SSL Certificate Status */}
+      {loadingSSL ? (
+        <div className="mb-6">
+          <div className="rounded-lg border border-gray-200 bg-white p-5">
+            <SkeletonBlock className="mb-4 h-5 w-36" />
+            <SkeletonBlock className="mb-2 h-4 w-full" />
+            <SkeletonBlock className="mb-2 h-4 w-full" />
+            <SkeletonBlock className="h-4 w-3/4" />
+          </div>
+        </div>
+      ) : (
+        <div className="mb-6">
+          <SSLStatusCard cert={sslCert} />
+        </div>
+      )}
 
       {/* Period selector */}
       <div className="mb-4 flex items-center justify-between">

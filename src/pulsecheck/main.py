@@ -14,6 +14,7 @@ from pulsecheck.api.v1.routes.alerts import router as alerts_router
 from pulsecheck.api.v1.routes.channels import router as channels_router
 from pulsecheck.api.v1.routes.metrics import router as metrics_router
 from pulsecheck.api.v1.routes.services import router as services_router
+from pulsecheck.api.v1.routes.ssl import router as ssl_router
 from pulsecheck.checker.engine import HealthCheckEngine
 from pulsecheck.db.session import get_session
 from pulsecheck.models.health_check import HealthCheck
@@ -36,6 +37,7 @@ app.include_router(metrics_router)
 app.include_router(alert_rules_router)
 app.include_router(channels_router)
 app.include_router(alerts_router)
+app.include_router(ssl_router)
 
 app.add_middleware(
     CORSMiddleware,
