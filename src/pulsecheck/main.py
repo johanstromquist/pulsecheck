@@ -1,5 +1,8 @@
+import time
+from datetime import datetime, timezone
 from importlib.metadata import metadata, PackageNotFoundError
-from fastapi import FastAPI
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="PulseCheck")
@@ -12,10 +15,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+_start_time = time.monotonic()
+_request_count = 0
+
+
+@app.middleware("http")
+async def count_requests(request: Request, call_next):
+    global _request_count
+    _request_count += 1
+    return await call_next(request)
+
 
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
+
+
+@app.get("/api/v1/status")
+def status() -> dict:
+    uptime_seconds = time.monotonic() - _start_time
+    return {
+        "uptime_seconds": round(uptime_seconds, 2),
+        "request_count": _request_count,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 @app.get("/api/v1/version")
