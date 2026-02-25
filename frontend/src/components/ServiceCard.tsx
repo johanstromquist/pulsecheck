@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import type { Service, HealthCheck } from "../api/client";
 import { fetchHealthChecks } from "../api/client";
+import type { HealthCheckMessage } from "../hooks/useWebSocket";
 
 interface ServiceCardProps {
   service: Service;
+  realtimeCheck: HealthCheckMessage | null;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -22,7 +24,7 @@ function formatTime(iso: string): string {
   return new Date(iso).toLocaleString();
 }
 
-export default function ServiceCard({ service }: ServiceCardProps) {
+export default function ServiceCard({ service, realtimeCheck }: ServiceCardProps) {
   const [latestCheck, setLatestCheck] = useState<HealthCheck | null>(null);
 
   useEffect(() => {
@@ -33,9 +35,14 @@ export default function ServiceCard({ service }: ServiceCardProps) {
       .catch(() => {});
   }, [service.id]);
 
-  const status = latestCheck?.status ?? "unknown";
-  const dotColor = STATUS_COLORS[status] ?? "bg-gray-400";
-  const label = STATUS_LABELS[status] ?? "Unknown";
+  // Use realtime data if it's newer than the fetched check
+  const displayStatus = realtimeCheck?.status ?? latestCheck?.status ?? "unknown";
+  const displayTime = realtimeCheck?.checked_at ?? latestCheck?.checked_at ?? null;
+  const displayResponseTime =
+    realtimeCheck?.response_time_ms ?? latestCheck?.response_time_ms ?? null;
+
+  const dotColor = STATUS_COLORS[displayStatus] ?? "bg-gray-400";
+  const label = STATUS_LABELS[displayStatus] ?? "Unknown";
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
@@ -53,12 +60,12 @@ export default function ServiceCard({ service }: ServiceCardProps) {
 
       <div className="flex items-center justify-between text-xs text-gray-400">
         <span>
-          {latestCheck
-            ? `Last check: ${formatTime(latestCheck.checked_at)}`
+          {displayTime
+            ? `Last check: ${formatTime(displayTime)}`
             : "No checks yet"}
         </span>
-        {latestCheck?.response_time_ms != null && (
-          <span>{latestCheck.response_time_ms} ms</span>
+        {displayResponseTime != null && (
+          <span>{displayResponseTime} ms</span>
         )}
       </div>
     </div>

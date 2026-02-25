@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from importlib.metadata import metadata, PackageNotFoundError
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +14,7 @@ from pulsecheck.checker.engine import HealthCheckEngine
 from pulsecheck.db.session import get_session
 from pulsecheck.models.health_check import HealthCheck
 from pulsecheck.models.service import Service
+from pulsecheck.ws import manager as ws_manager
 
 _engine = HealthCheckEngine()
 
@@ -111,3 +112,13 @@ async def get_service_checks(
         }
         for check in checks
     ]
+
+
+@app.websocket("/ws/status")
+async def websocket_status(websocket: WebSocket):
+    await ws_manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)

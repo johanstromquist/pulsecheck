@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pulsecheck.db.session import async_session_factory
 from pulsecheck.models.health_check import HealthCheck, HealthStatus
 from pulsecheck.models.service import Service
+from pulsecheck.ws import manager as ws_manager
 
 logger = logging.getLogger(__name__)
 
@@ -133,3 +134,11 @@ class HealthCheckEngine:
             status_code,
             response_time_ms,
         )
+
+        await ws_manager.broadcast({
+            "type": "health_check",
+            "service_id": str(service.id),
+            "status": status.value,
+            "response_time_ms": response_time_ms,
+            "checked_at": check.checked_at.isoformat(),
+        })
