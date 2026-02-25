@@ -6,7 +6,7 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 
 from pulsecheck.db.base import Base
-from pulsecheck.models import Service, HealthCheck, AlertRule, NotificationChannel, Alert, NotificationLog, alert_rule_channels  # noqa: F401 – register models
+from pulsecheck.models import Service, HealthCheck, CheckRegion, AlertRule, NotificationChannel, Alert, NotificationLog, alert_rule_channels  # noqa: F401 – register models
 
 config = context.config
 

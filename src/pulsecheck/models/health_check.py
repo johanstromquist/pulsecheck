@@ -21,6 +21,9 @@ class HealthCheck(Base):
     service_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("services.id", ondelete="CASCADE"), nullable=False
     )
+    region_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("check_regions.id", ondelete="SET NULL"), nullable=True
+    )
     status: Mapped[HealthStatus] = mapped_column(
         Enum(HealthStatus, name="health_status"), nullable=False
     )
@@ -32,3 +35,4 @@ class HealthCheck(Base):
     )
 
     service: Mapped["Service"] = relationship(back_populates="health_checks")  # noqa: F821
+    region: Mapped["CheckRegion | None"] = relationship(back_populates="health_checks")  # noqa: F821

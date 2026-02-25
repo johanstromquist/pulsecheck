@@ -16,12 +16,15 @@ import type {
   MetricsBucket,
   UptimePeriod,
   Period,
+  ByRegionResponse,
+  RegionCheckResult,
 } from "../api/client";
 import {
   fetchService,
   fetchHealthChecks,
   fetchMetrics,
   fetchUptime,
+  fetchChecksByRegion,
 } from "../api/client";
 
 const PERIODS: { value: Period; label: string }[] = [
@@ -293,6 +296,88 @@ function StatusDistributionChart({ data }: { data: MetricsBucket[] }) {
   );
 }
 
+function RegionStatusBreakdown({
+  data,
+}: {
+  data: ByRegionResponse | null;
+}) {
+  if (!data || data.regions.length === 0) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-5">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700">
+          Region Status Breakdown
+        </h3>
+        <div className="py-8 text-center text-sm text-gray-400">
+          No region data available. Configure check regions to enable
+          multi-region monitoring.
+        </div>
+      </div>
+    );
+  }
+
+  const consensusDot =
+    STATUS_COLORS[data.consensus_status ?? ""] ?? "bg-gray-400";
+  const consensusLabel =
+    STATUS_LABELS[data.consensus_status ?? ""] ?? "Unknown";
+
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-gray-700">
+          Region Status Breakdown
+        </h3>
+        <span className="flex items-center gap-1.5 text-xs text-gray-500">
+          Consensus:
+          <span
+            className={`inline-block h-2 w-2 rounded-full ${consensusDot}`}
+          />
+          <span className="font-medium">{consensusLabel}</span>
+        </span>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {data.regions.map((r) => {
+          const dot = STATUS_COLORS[r.status] ?? "bg-gray-400";
+          const label = STATUS_LABELS[r.status] ?? "Unknown";
+          return (
+            <div
+              key={r.region_id}
+              className="rounded-lg border border-gray-100 bg-gray-50 p-3"
+            >
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-800">
+                  {r.region_name}
+                </span>
+                <span className="flex items-center gap-1.5 text-xs">
+                  <span
+                    className={`inline-block h-2 w-2 rounded-full ${dot}`}
+                  />
+                  {label}
+                </span>
+              </div>
+              <div className="flex gap-4 text-xs text-gray-500">
+                <span>
+                  {r.response_time_ms !== null
+                    ? `${r.response_time_ms} ms`
+                    : "N/A"}
+                </span>
+                {r.status_code !== null && <span>HTTP {r.status_code}</span>}
+              </div>
+              {r.error_message && (
+                <p className="mt-1 truncate text-xs text-red-500">
+                  {r.error_message}
+                </p>
+              )}
+              <p className="mt-1 text-xs text-gray-400">
+                {formatTime(r.checked_at)}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function RecentChecksTable({ checks }: { checks: HealthCheck[] }) {
   if (checks.length === 0) {
     return (
@@ -371,10 +456,12 @@ export default function ServiceDetail() {
   const [metrics, setMetrics] = useState<MetricsBucket[]>([]);
   const [uptime, setUptime] = useState<UptimePeriod[]>([]);
   const [checks, setChecks] = useState<HealthCheck[]>([]);
+  const [regionData, setRegionData] = useState<ByRegionResponse | null>(null);
   const [period, setPeriod] = useState<Period>("24h");
   const [loadingService, setLoadingService] = useState(true);
   const [loadingMetrics, setLoadingMetrics] = useState(true);
   const [loadingChecks, setLoadingChecks] = useState(true);
+  const [loadingRegions, setLoadingRegions] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Load service info and uptime (once)
@@ -398,6 +485,16 @@ export default function ServiceDetail() {
       .then(setChecks)
       .catch(() => {})
       .finally(() => setLoadingChecks(false));
+  }, [id]);
+
+  // Load region breakdown (once)
+  useEffect(() => {
+    if (!id) return;
+    setLoadingRegions(true);
+    fetchChecksByRegion(id)
+      .then(setRegionData)
+      .catch(() => setRegionData(null))
+      .finally(() => setLoadingRegions(false));
   }, [id]);
 
   // Load metrics (on period change)
@@ -515,6 +612,15 @@ export default function ServiceDetail() {
             <ResponseTimeChart data={metrics} />
             <StatusDistributionChart data={metrics} />
           </>
+        )}
+      </div>
+
+      {/* Region status breakdown */}
+      <div className="mb-6">
+        {loadingRegions ? (
+          <TableSkeleton />
+        ) : (
+          <RegionStatusBreakdown data={regionData} />
         )}
       </div>
 

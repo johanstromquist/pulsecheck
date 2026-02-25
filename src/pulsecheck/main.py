@@ -13,6 +13,7 @@ from pulsecheck.api.v1.routes.alert_rules import router as alert_rules_router
 from pulsecheck.api.v1.routes.alerts import router as alerts_router
 from pulsecheck.api.v1.routes.channels import router as channels_router
 from pulsecheck.api.v1.routes.metrics import router as metrics_router
+from pulsecheck.api.v1.routes.regions import router as regions_router
 from pulsecheck.api.v1.routes.services import router as services_router
 from pulsecheck.checker.engine import HealthCheckEngine
 from pulsecheck.db.session import get_session
@@ -36,6 +37,7 @@ app.include_router(metrics_router)
 app.include_router(alert_rules_router)
 app.include_router(channels_router)
 app.include_router(alerts_router)
+app.include_router(regions_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -112,6 +114,7 @@ async def get_service_checks(
         {
             "id": str(check.id),
             "service_id": str(check.service_id),
+            "region_id": str(check.region_id) if check.region_id else None,
             "status": check.status.value,
             "response_time_ms": check.response_time_ms,
             "status_code": check.status_code,
