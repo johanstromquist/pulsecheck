@@ -5,7 +5,10 @@ from importlib.metadata import metadata, PackageNotFoundError
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
+from pulsecheck.api.v1.routes.services import router as services_router
+
 app = FastAPI(title="PulseCheck")
+app.include_router(services_router)
 
 app.add_middleware(
     CORSMiddleware,
