@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import type { Service, HealthCheck } from "../api/client";
+import type { Service } from "../api/client";
 import { fetchServices } from "../api/client";
 import ServiceCard from "../components/ServiceCard";
 import AddServiceModal from "../components/AddServiceModal";
