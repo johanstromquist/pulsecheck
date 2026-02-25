@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import type { Service } from "../api/client";
 import { fetchServices } from "../api/client";
 import ServiceCard from "../components/ServiceCard";
@@ -58,12 +59,26 @@ export default function Dashboard() {
             {connected ? "Live" : "Disconnected"}
           </span>
         </div>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          + Add Service
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/incidents"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Incidents
+          </Link>
+          <Link
+            to="/status"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Status Page
+          </Link>
+          <button
+            onClick={() => setModalOpen(true)}
+            className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            + Add Service
+          </button>
+        </div>
       </div>
 
       {loading ? (
