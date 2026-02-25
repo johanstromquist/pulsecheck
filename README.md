@@ -1,3 +1,3 @@
 # PulseCheck
 
-Infrastructure monitoring application.
+Test repository for E2E pipeline testing.
