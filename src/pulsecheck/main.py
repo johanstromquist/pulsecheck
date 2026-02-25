@@ -1,13 +1,31 @@
 import time
+import uuid
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from importlib.metadata import metadata, PackageNotFoundError
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from pulsecheck.api.v1.routes.services import router as services_router
+from pulsecheck.checker.engine import HealthCheckEngine
+from pulsecheck.db.session import get_session
+from pulsecheck.models.health_check import HealthCheck
+from pulsecheck.models.service import Service
 
-app = FastAPI(title="PulseCheck")
+_engine = HealthCheckEngine()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await _engine.start()
+    yield
+    await _engine.stop()
+
+
+app = FastAPI(title="PulseCheck", lifespan=lifespan)
 app.include_router(services_router)
 
 app.add_middleware(
@@ -60,3 +78,36 @@ def version() -> dict:
         else:
             ver = "unknown"
     return {"version": ver}
+
+
+@app.get("/api/v1/services/{service_id}/checks")
+async def get_service_checks(
+    service_id: uuid.UUID,
+    session: AsyncSession = Depends(get_session),
+) -> list[dict]:
+    # Verify the service exists
+    svc = await session.get(Service, service_id)
+    if svc is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+
+    stmt = (
+        select(HealthCheck)
+        .where(HealthCheck.service_id == service_id)
+        .order_by(HealthCheck.checked_at.desc())
+        .limit(100)
+    )
+    result = await session.execute(stmt)
+    checks = result.scalars().all()
+
+    return [
+        {
+            "id": str(check.id),
+            "service_id": str(check.service_id),
+            "status": check.status.value,
+            "response_time_ms": check.response_time_ms,
+            "status_code": check.status_code,
+            "error_message": check.error_message,
+            "checked_at": check.checked_at.isoformat(),
+        }
+        for check in checks
+    ]
