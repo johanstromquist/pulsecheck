@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from pulsecheck.db.base import Base
 from pulsecheck.models.health_check import HealthCheck, HealthStatus
+from pulsecheck.models.region import CheckRegion
 from pulsecheck.models.service import Service
 from pulsecheck.models.alert import (
     AlertRule,
