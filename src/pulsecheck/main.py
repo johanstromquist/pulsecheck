@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from pulsecheck.api.v1.routes.alert_rules import router as alert_rules_router
 from pulsecheck.api.v1.routes.alerts import router as alerts_router
+from pulsecheck.api.v1.routes.auth import router as auth_router
 from pulsecheck.api.v1.routes.channels import router as channels_router
 from pulsecheck.api.v1.routes.incidents import router as incidents_router
 from pulsecheck.api.v1.routes.metrics import router as metrics_router
@@ -18,6 +19,7 @@ from pulsecheck.api.v1.routes.regions import router as regions_router
 from pulsecheck.api.v1.routes.services import router as services_router
 from pulsecheck.api.v1.routes.ssl import router as ssl_router
 from pulsecheck.api.v1.routes.status_page import router as status_page_router
+from pulsecheck.auth import api_key_middleware
 from pulsecheck.checker.engine import HealthCheckEngine
 from pulsecheck.db.session import get_session
 from pulsecheck.models.health_check import HealthCheck
@@ -35,6 +37,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="PulseCheck", lifespan=lifespan)
+app.include_router(auth_router)
 app.include_router(services_router)
 app.include_router(metrics_router)
 app.include_router(alert_rules_router)
@@ -62,6 +65,9 @@ async def count_requests(request: Request, call_next):
     global _request_count
     _request_count += 1
     return await call_next(request)
+
+
+app.middleware("http")(api_key_middleware)
 
 
 @app.get("/health")
