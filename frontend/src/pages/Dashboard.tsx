@@ -4,6 +4,7 @@ import type { Service } from "../api/client";
 import { fetchServices } from "../api/client";
 import ServiceCard from "../components/ServiceCard";
 import AddServiceModal from "../components/AddServiceModal";
+import ThemeToggle from "../components/ThemeToggle";
 import { useWebSocket } from "../hooks/useWebSocket";
 import type { HealthCheckMessage } from "../hooks/useWebSocket";
 
@@ -46,9 +47,9 @@ export default function Dashboard() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-gray-900">PulseCheck</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">PulseCheck</h1>
           <span
-            className="flex items-center gap-1.5 text-xs text-gray-500"
+            className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"
             title={connected ? "Live updates active" : "Reconnecting…"}
           >
             <span
@@ -62,16 +63,17 @@ export default function Dashboard() {
         <div className="flex items-center gap-3">
           <Link
             to="/incidents"
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm text-blue-600 hover:underline dark:text-blue-400"
           >
             Incidents
           </Link>
           <Link
             to="/status"
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm text-blue-600 hover:underline dark:text-blue-400"
           >
             Status Page
           </Link>
+          <ThemeToggle />
           <button
             onClick={() => setModalOpen(true)}
             className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
@@ -82,9 +84,9 @@ export default function Dashboard() {
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading services…</p>
+        <p className="text-gray-500 dark:text-gray-400">Loading services…</p>
       ) : services.length === 0 ? (
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-gray-400">
           No services yet. Click "+ Add Service" to get started.
         </p>
       ) : (

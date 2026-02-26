@@ -48,21 +48,21 @@ export default function ServiceCard({ service, realtimeCheck }: ServiceCardProps
   return (
     <Link
       to={`/services/${service.id}`}
-      className="block rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+      className="block rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
     >
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
-        <span className="flex items-center gap-1.5 text-sm text-gray-600">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{service.name}</h3>
+        <span className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300">
           <span className={`inline-block h-3 w-3 rounded-full ${dotColor}`} />
           {label}
         </span>
       </div>
 
-      <p className="mb-3 truncate text-sm text-gray-500" title={service.url}>
+      <p className="mb-3 truncate text-sm text-gray-500 dark:text-gray-400" title={service.url}>
         {service.url}
       </p>
 
-      <div className="flex items-center justify-between text-xs text-gray-400">
+      <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
         <span>
           {displayTime
             ? `Last check: ${formatTime(displayTime)}`
