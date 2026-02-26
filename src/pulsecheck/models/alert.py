@@ -3,16 +3,16 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import (
+    JSON,
     Boolean,
+    Column,
     DateTime,
     Enum,
     ForeignKey,
     Integer,
-    JSON,
     String,
-    Text,
     Table,
-    Column,
+    Text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

@@ -1,8 +1,6 @@
 import uuid
 from datetime import datetime, timezone
 
-import pytest
-
 from pulsecheck.checker.distributed import DistributedChecker
 from pulsecheck.models.health_check import HealthCheck, HealthStatus
 

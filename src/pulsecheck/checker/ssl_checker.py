@@ -1,7 +1,7 @@
 import asyncio
 import logging
-import ssl
 import socket
+import ssl
 from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlparse

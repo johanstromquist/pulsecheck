@@ -4,8 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from pulsecheck.models.alert import ConditionType, ChannelType, Severity, NotificationStatus
-
+from pulsecheck.models.alert import ChannelType, ConditionType, NotificationStatus, Severity
 
 # --- AlertRule schemas ---
 
