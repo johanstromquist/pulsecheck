@@ -18,7 +18,6 @@ import type {
   Period,
   SSLCertificate,
   ByRegionResponse,
-  RegionCheckResult,
 } from "../api/client";
 import {
   fetchService,
@@ -62,13 +61,13 @@ function formatChartTime(iso: string): string {
 
 function SkeletonBlock({ className = "" }: { className?: string }) {
   return (
-    <div className={`animate-pulse rounded bg-gray-200 ${className}`} />
+    <div className={`animate-pulse rounded bg-gray-200 dark:bg-gray-700 ${className}`} />
   );
 }
 
 function ChartSkeleton() {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
       <SkeletonBlock className="mb-4 h-5 w-40" />
       <SkeletonBlock className="h-64 w-full" />
     </div>
@@ -77,7 +76,7 @@ function ChartSkeleton() {
 
 function TableSkeleton() {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
       <SkeletonBlock className="mb-4 h-5 w-36" />
       {Array.from({ length: 5 }).map((_, i) => (
         <SkeletonBlock key={i} className="mb-2 h-8 w-full" />
@@ -95,11 +94,11 @@ function UptimeBadge({
   period: string;
   percentage: number | null;
 }) {
-  let color = "bg-gray-100 text-gray-500";
+  let color = "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400";
   if (percentage !== null) {
-    if (percentage >= 99) color = "bg-green-100 text-green-800";
-    else if (percentage >= 95) color = "bg-yellow-100 text-yellow-800";
-    else color = "bg-red-100 text-red-800";
+    if (percentage >= 99) color = "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400";
+    else if (percentage >= 95) color = "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400";
+    else color = "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400";
   }
 
   return (
@@ -128,7 +127,7 @@ function PeriodSelector({
           className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
             selected === p.value
               ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
           }`}
         >
           {p.label}
@@ -141,11 +140,11 @@ function PeriodSelector({
 function ResponseTimeChart({ data }: { data: MetricsBucket[] }) {
   if (data.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-5">
-        <h3 className="mb-4 text-sm font-semibold text-gray-700">
+      <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
           Response Time
         </h3>
-        <div className="flex h-64 items-center justify-center text-sm text-gray-400">
+        <div className="flex h-64 items-center justify-center text-sm text-gray-400 dark:text-gray-500">
           No data available for this period.
         </div>
       </div>
@@ -160,8 +159,8 @@ function ResponseTimeChart({ data }: { data: MetricsBucket[] }) {
   }));
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5">
-      <h3 className="mb-4 text-sm font-semibold text-gray-700">
+    <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+      <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
         Response Time (ms)
       </h3>
       <ResponsiveContainer width="100%" height={280}>
@@ -172,7 +171,7 @@ function ResponseTimeChart({ data }: { data: MetricsBucket[] }) {
               <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:[&>line]:stroke-gray-700" />
           <XAxis
             dataKey="time"
             tick={{ fontSize: 11, fill: "#9ca3af" }}
@@ -189,6 +188,8 @@ function ResponseTimeChart({ data }: { data: MetricsBucket[] }) {
               fontSize: 12,
               borderRadius: 8,
               border: "1px solid #e5e7eb",
+              backgroundColor: "var(--tooltip-bg, #fff)",
+              color: "var(--tooltip-color, #111)",
             }}
             formatter={(value: unknown) =>
               value != null ? [`${value} ms`] : ["N/A"]
@@ -225,11 +226,11 @@ function ResponseTimeChart({ data }: { data: MetricsBucket[] }) {
 function StatusDistributionChart({ data }: { data: MetricsBucket[] }) {
   if (data.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-5">
-        <h3 className="mb-4 text-sm font-semibold text-gray-700">
+      <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
           Status Distribution
         </h3>
-        <div className="flex h-64 items-center justify-center text-sm text-gray-400">
+        <div className="flex h-64 items-center justify-center text-sm text-gray-400 dark:text-gray-500">
           No data available for this period.
         </div>
       </div>
@@ -244,8 +245,8 @@ function StatusDistributionChart({ data }: { data: MetricsBucket[] }) {
   }));
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5">
-      <h3 className="mb-4 text-sm font-semibold text-gray-700">
+    <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+      <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
         Status Distribution
       </h3>
       <ResponsiveContainer width="100%" height={280}>
@@ -266,6 +267,8 @@ function StatusDistributionChart({ data }: { data: MetricsBucket[] }) {
               fontSize: 12,
               borderRadius: 8,
               border: "1px solid #e5e7eb",
+              backgroundColor: "var(--tooltip-bg, #fff)",
+              color: "var(--tooltip-color, #111)",
             }}
           />
           <Area
@@ -305,11 +308,11 @@ function RegionStatusBreakdown({
 }) {
   if (!data || data.regions.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-5">
-        <h3 className="mb-4 text-sm font-semibold text-gray-700">
+      <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
           Region Status Breakdown
         </h3>
-        <div className="py-8 text-center text-sm text-gray-400">
+        <div className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">
           No region data available. Configure check regions to enable
           multi-region monitoring.
         </div>
@@ -323,12 +326,12 @@ function RegionStatusBreakdown({
     STATUS_LABELS[data.consensus_status ?? ""] ?? "Unknown";
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-700">
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Region Status Breakdown
         </h3>
-        <span className="flex items-center gap-1.5 text-xs text-gray-500">
+        <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
           Consensus:
           <span
             className={`inline-block h-2 w-2 rounded-full ${consensusDot}`}
@@ -343,10 +346,10 @@ function RegionStatusBreakdown({
           return (
             <div
               key={r.region_id}
-              className="rounded-lg border border-gray-100 bg-gray-50 p-3"
+              className="rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-700/50"
             >
               <div className="mb-1 flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-800">
+                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
                   {r.region_name}
                 </span>
                 <span className="flex items-center gap-1.5 text-xs">
@@ -356,7 +359,7 @@ function RegionStatusBreakdown({
                   {label}
                 </span>
               </div>
-              <div className="flex gap-4 text-xs text-gray-500">
+              <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400">
                 <span>
                   {r.response_time_ms !== null
                     ? `${r.response_time_ms} ms`
@@ -365,11 +368,11 @@ function RegionStatusBreakdown({
                 {r.status_code !== null && <span>HTTP {r.status_code}</span>}
               </div>
               {r.error_message && (
-                <p className="mt-1 truncate text-xs text-red-500">
+                <p className="mt-1 truncate text-xs text-red-500 dark:text-red-400">
                   {r.error_message}
                 </p>
               )}
-              <p className="mt-1 text-xs text-gray-400">
+              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                 {formatTime(r.checked_at)}
               </p>
             </div>
@@ -383,11 +386,11 @@ function RegionStatusBreakdown({
 function RecentChecksTable({ checks }: { checks: HealthCheck[] }) {
   if (checks.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-5">
-        <h3 className="mb-4 text-sm font-semibold text-gray-700">
+      <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
           Recent Checks
         </h3>
-        <div className="py-8 text-center text-sm text-gray-400">
+        <div className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">
           No health checks recorded yet.
         </div>
       </div>
@@ -395,14 +398,14 @@ function RecentChecksTable({ checks }: { checks: HealthCheck[] }) {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5">
-      <h3 className="mb-4 text-sm font-semibold text-gray-700">
+    <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+      <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
         Recent Checks
       </h3>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 text-left text-xs text-gray-500">
+            <tr className="border-b border-gray-100 text-left text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
               <th className="pb-2 pr-4 font-medium">Status</th>
               <th className="pb-2 pr-4 font-medium">Response Time</th>
               <th className="pb-2 pr-4 font-medium">Status Code</th>
@@ -418,7 +421,7 @@ function RecentChecksTable({ checks }: { checks: HealthCheck[] }) {
               return (
                 <tr
                   key={check.id}
-                  className="border-b border-gray-50 last:border-0"
+                  className="border-b border-gray-50 last:border-0 dark:border-gray-700/50"
                 >
                   <td className="py-2 pr-4">
                     <span className="flex items-center gap-1.5">
@@ -428,15 +431,15 @@ function RecentChecksTable({ checks }: { checks: HealthCheck[] }) {
                       {label}
                     </span>
                   </td>
-                  <td className="py-2 pr-4 text-gray-600">
+                  <td className="py-2 pr-4 text-gray-600 dark:text-gray-400">
                     {check.response_time_ms !== null
                       ? `${check.response_time_ms} ms`
                       : "—"}
                   </td>
-                  <td className="py-2 pr-4 text-gray-600">
+                  <td className="py-2 pr-4 text-gray-600 dark:text-gray-400">
                     {check.status_code ?? "—"}
                   </td>
-                  <td className="py-2 text-gray-400">
+                  <td className="py-2 text-gray-400 dark:text-gray-500">
                     {formatTime(check.checked_at)}
                   </td>
                 </tr>
@@ -454,11 +457,11 @@ function RecentChecksTable({ checks }: { checks: HealthCheck[] }) {
 function SSLStatusCard({ cert }: { cert: SSLCertificate | null }) {
   if (cert === null) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-5">
-        <h3 className="mb-4 text-sm font-semibold text-gray-700">
+      <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
           SSL Certificate
         </h3>
-        <div className="py-4 text-center text-sm text-gray-400">
+        <div className="py-4 text-center text-sm text-gray-400 dark:text-gray-500">
           No SSL certificate data available. Service may not use HTTPS.
         </div>
       </div>
@@ -466,13 +469,13 @@ function SSLStatusCard({ cert }: { cert: SSLCertificate | null }) {
   }
 
   const days = cert.days_until_expiry;
-  let statusColor = "text-green-700 bg-green-100";
+  let statusColor = "text-green-700 bg-green-100 dark:bg-green-900/40 dark:text-green-400";
   let statusLabel = "Valid";
   if (days <= 7) {
-    statusColor = "text-red-700 bg-red-100";
+    statusColor = "text-red-700 bg-red-100 dark:bg-red-900/40 dark:text-red-400";
     statusLabel = "Critical";
   } else if (days <= 30) {
-    statusColor = "text-yellow-700 bg-yellow-100";
+    statusColor = "text-yellow-700 bg-yellow-100 dark:bg-yellow-900/40 dark:text-yellow-400";
     statusLabel = "Expiring Soon";
   }
 
@@ -487,9 +490,9 @@ function SSLStatusCard({ cert }: { cert: SSLCertificate | null }) {
   else if (days <= 30) dotColor = "bg-yellow-500";
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-700">SSL Certificate</h3>
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">SSL Certificate</h3>
         <span
           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor}`}
         >
@@ -499,30 +502,30 @@ function SSLStatusCard({ cert }: { cert: SSLCertificate | null }) {
       </div>
       <div className="space-y-3">
         <div className="flex items-start justify-between">
-          <span className="text-xs text-gray-500">Issuer</span>
-          <span className="max-w-[60%] text-right text-xs font-medium text-gray-700 break-all">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Issuer</span>
+          <span className="max-w-[60%] text-right text-xs font-medium text-gray-700 break-all dark:text-gray-300">
             {cert.issuer}
           </span>
         </div>
         <div className="flex items-start justify-between">
-          <span className="text-xs text-gray-500">Subject</span>
-          <span className="max-w-[60%] text-right text-xs font-medium text-gray-700 break-all">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Subject</span>
+          <span className="max-w-[60%] text-right text-xs font-medium text-gray-700 break-all dark:text-gray-300">
             {cert.subject}
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500">Expiry Date</span>
-          <span className="text-xs font-medium text-gray-700">{expiryDate}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">Expiry Date</span>
+          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{expiryDate}</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500">Days Remaining</span>
-          <span className={`text-sm font-bold ${days <= 7 ? "text-red-600" : days <= 30 ? "text-yellow-600" : "text-green-600"}`}>
+          <span className="text-xs text-gray-500 dark:text-gray-400">Days Remaining</span>
+          <span className={`text-sm font-bold ${days <= 7 ? "text-red-600 dark:text-red-400" : days <= 30 ? "text-yellow-600 dark:text-yellow-400" : "text-green-600 dark:text-green-400"}`}>
             {days}
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500">Last Checked</span>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Last Checked</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
             {new Date(cert.last_checked_at).toLocaleString()}
           </span>
         </div>
@@ -616,11 +619,11 @@ export default function ServiceDetail() {
       <div className="mx-auto max-w-6xl px-4 py-8">
         <Link
           to="/"
-          className="mb-4 inline-block text-sm text-blue-600 hover:underline"
+          className="mb-4 inline-block text-sm text-blue-600 hover:underline dark:text-blue-400"
         >
           &larr; Back to Dashboard
         </Link>
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center text-red-600">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center text-red-600 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400">
           {error}
         </div>
       </div>
@@ -643,14 +646,14 @@ export default function ServiceDetail() {
       {/* Back link */}
       <Link
         to="/"
-        className="mb-4 inline-block text-sm text-blue-600 hover:underline"
+        className="mb-4 inline-block text-sm text-blue-600 hover:underline dark:text-blue-400"
       >
         &larr; Back to Dashboard
       </Link>
 
       {/* Service header */}
       {loadingService ? (
-        <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6">
+        <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
           <SkeletonBlock className="mb-2 h-7 w-48" />
           <SkeletonBlock className="mb-4 h-4 w-72" />
           <div className="flex gap-2">
@@ -660,19 +663,19 @@ export default function ServiceDetail() {
           </div>
         </div>
       ) : service ? (
-        <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6">
+        <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
           <div className="mb-2 flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {service.name}
             </h1>
-            <span className="flex items-center gap-1.5 text-sm text-gray-600">
+            <span className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300">
               <span
                 className={`inline-block h-3 w-3 rounded-full ${dotColor}`}
               />
               {statusLabel}
             </span>
           </div>
-          <p className="mb-4 text-sm text-gray-500">{service.url}</p>
+          <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">{service.url}</p>
           <div className="flex flex-wrap gap-2">
             <UptimeBadge
               period="24h"
@@ -693,7 +696,7 @@ export default function ServiceDetail() {
       {/* SSL Certificate Status */}
       {loadingSSL ? (
         <div className="mb-6">
-          <div className="rounded-lg border border-gray-200 bg-white p-5">
+          <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
             <SkeletonBlock className="mb-4 h-5 w-36" />
             <SkeletonBlock className="mb-2 h-4 w-full" />
             <SkeletonBlock className="mb-2 h-4 w-full" />
@@ -708,7 +711,7 @@ export default function ServiceDetail() {
 
       {/* Period selector */}
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-800">Metrics</h2>
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Metrics</h2>
         <PeriodSelector selected={period} onChange={handlePeriodChange} />
       </div>
 
