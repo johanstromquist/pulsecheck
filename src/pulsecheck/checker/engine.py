@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 import httpx
-from sqlalchemy import select, and_
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pulsecheck.alerting.dispatcher import NotificationDispatcher
@@ -14,9 +14,10 @@ from pulsecheck.checker.ssl_checker import check_ssl_certificate, extract_host_f
 from pulsecheck.db.session import async_session_factory
 from pulsecheck.models.alert import Alert, AlertRule, ConditionType, Severity
 from pulsecheck.models.health_check import HealthCheck, HealthStatus
-from pulsecheck.models.incident import Incident, IncidentStatus, IncidentSeverity, IncidentUpdate as IncidentUpdateModel
-from pulsecheck.models.ssl_certificate import SSLCertificate
+from pulsecheck.models.incident import Incident, IncidentSeverity, IncidentStatus
+from pulsecheck.models.incident import IncidentUpdate as IncidentUpdateModel
 from pulsecheck.models.service import Service
+from pulsecheck.models.ssl_certificate import SSLCertificate
 from pulsecheck.ws import manager as ws_manager
 
 logger = logging.getLogger(__name__)

@@ -7,11 +7,8 @@ import pytest
 from pulsecheck.alerting.dispatcher import NotificationDispatcher
 from pulsecheck.models.alert import (
     Alert,
-    AlertRule,
-    ConditionType,
     ChannelType,
     NotificationChannel,
-    NotificationLog,
     NotificationStatus,
     Severity,
 )

@@ -9,16 +9,18 @@ from sqlalchemy.orm import selectinload
 from pulsecheck.db.session import get_session
 from pulsecheck.models.incident import (
     Incident,
-    IncidentStatus,
     IncidentSeverity,
+    IncidentStatus,
+)
+from pulsecheck.models.incident import (
     IncidentUpdate as IncidentUpdateModel,
 )
 from pulsecheck.schemas.incident import (
     IncidentCreate,
+    IncidentDetailResponse,
+    IncidentResponse,
     IncidentUpdate,
     IncidentUpdateCreate,
-    IncidentResponse,
-    IncidentDetailResponse,
     IncidentUpdateResponse,
 )
 

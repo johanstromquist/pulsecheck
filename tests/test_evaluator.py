@@ -2,10 +2,8 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 import pytest
-import pytest_asyncio
-from sqlalchemy import select
 
-from pulsecheck.alerting.evaluator import AlertEvaluator, DEDUP_WINDOW_MINUTES
+from pulsecheck.alerting.evaluator import AlertEvaluator
 from pulsecheck.models.alert import Alert, AlertRule, ConditionType, Severity
 from pulsecheck.models.health_check import HealthCheck, HealthStatus
 

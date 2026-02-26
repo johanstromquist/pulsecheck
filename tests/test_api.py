@@ -13,8 +13,6 @@ from pulsecheck.models.alert import (
     Alert,
     AlertRule,
     ConditionType,
-    ChannelType,
-    NotificationChannel,
     Severity,
 )
 

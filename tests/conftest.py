@@ -4,18 +4,17 @@ from datetime import datetime, timezone
 
 import pytest
 import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from pulsecheck.db.base import Base
-from pulsecheck.models.health_check import HealthCheck, HealthStatus
-from pulsecheck.models.region import CheckRegion
-from pulsecheck.models.service import Service
+from pulsecheck.db.session import get_session
+from pulsecheck.main import app
 from pulsecheck.models.alert import (
-    AlertRule,
-    NotificationChannel,
-    ConditionType,
     ChannelType,
+    NotificationChannel,
 )
+from pulsecheck.models.service import Service
 
 
 @pytest.fixture(scope="session")
@@ -72,3 +71,27 @@ async def sample_channel(session):
     session.add(channel)
     await session.commit()
     return channel
+
+
+@pytest_asyncio.fixture
+async def client(engine):
+    """Test client with overridden database session."""
+    factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+    async def override_session():
+        async with factory() as sess:
+            yield sess
+
+    app.dependency_overrides[get_session] = override_session
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as c:
+        yield c
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def db_session(engine):
+    """Alias for session that shares the same engine as the test client."""
+    factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async with factory() as sess:
+        yield sess

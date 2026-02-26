@@ -2,7 +2,7 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from importlib.metadata import metadata, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, metadata
 
 from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -86,8 +86,8 @@ def version() -> dict:
         ver = meta["Version"]
     except PackageNotFoundError:
         # Fallback: read version directly from pyproject.toml
-        from pathlib import Path
         import tomllib
+        from pathlib import Path
 
         pyproject = Path(__file__).resolve().parents[2] / "pyproject.toml"
         if pyproject.exists():
