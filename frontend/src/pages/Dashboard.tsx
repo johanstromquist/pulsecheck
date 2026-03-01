@@ -5,6 +5,7 @@ import { fetchServices } from "../api/client";
 import ServiceCard from "../components/ServiceCard";
 import AddServiceModal from "../components/AddServiceModal";
 import ThemeToggle from "../components/ThemeToggle";
+import Logo from "../components/Logo";
 import { useWebSocket } from "../hooks/useWebSocket";
 import type { HealthCheckMessage } from "../hooks/useWebSocket";
 
@@ -47,6 +48,7 @@ export default function Dashboard() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <Logo className="h-7 w-7 text-gray-900 dark:text-white" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">PulseCheck</h1>
           <span
             className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"
